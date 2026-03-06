@@ -4,56 +4,166 @@ alwaysApply: true
 
 ## Chart Layout and Structure
 
-- When implementing **any chart or time series visualization**, wrap it in a `div` with class `chart-card` and follow this general structure:
-  - `div.chart-card`
-    - `div.header` containing a left-aligned title (`.logo`) and a right-aligned secondary action (`.open`).
-    - `fieldset.crypto-switch` for switching between series (e.g., BTC/ETH/SOL/TET) using `input[type="radio"]` and `label` pairs, plus a `.slider` element for the animated background.
-    - `div.price-infos` containing one or more `.price-info` sections, each with:
-      - `.price` (primary metric, e.g., current value)
-      - `.stats` with `.amount` and `.change` elements.
-    - `div.chart` containing one or more `svg` elements with `path` elements for the chart line.
+- When implementing **any chart or time series visualization**, use the following CSS Pattern
 
-## Required CSS Pattern
+- The corresponding CSS style (colors, layout, animation) should be **copied or closely mirrored** from the original snippet you provided so that all charts in this project share this same interactive card look and feel.
 
-- Charts should reuse or closely follow this **CSS pattern** (class names must match, content can be customized):
-  - `.chart-card` for the main card container (dark background, rounded corners, drop shadow).
-  - `.header`, `.logo`, `.open` for the header layout and hover interaction.
-  - `.crypto-switch`, its `input`/`label` structure, and `.slider` for the segmented switch and animated slider.
-  - `.price-infos`, `.price-info`, `.price-info .price`, `.price-info .stats`, `.price-info .change` for the numeric summary.
-  - `.chart`, `.chart svg`, `.chart path` with an animated `stroke-dasharray` / `stroke-dashoffset` and `@keyframes draw` to animate the chart line.
-  - Use `:has()` selectors on `.chart-card` to toggle which `svg` and `.price-info` are visible based on the checked radio input.
+```css
+.crypto-card {
+  max-width: 360px;
+  width: 90%;
+  padding: 20px;
+  border-radius: 35px;
+  background: #000;
+  color: #fff;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
 
-## HTML/CSS Reference Snippet
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.logo {
+  font-weight: bold;
+  font-size: 1.2em;
+}
+.open {
+  font-size: 0.85em;
+  color: #888;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.open:hover {
+  color: #fff;
+}
 
-- Treat the following as the **canonical reference** for how charts should look and behave (you may adapt text, IDs, and values as needed, but keep the structure and class names, using `chart-card` instead of `crypto-card`):
+.crypto-switch {
+  position: relative;
+  display: flex;
+  background: #222;
+  border-radius: 20px;
+  padding: 4px;
+  gap: 8px;
+  margin-bottom: 16px;
+  user-select: none;
+}
+.crypto-switch input {
+  display: none;
+}
+.crypto-switch label {
+  flex: 1;
+  text-align: center;
+  padding: 8px 0;
+  border-radius: 16px;
+  cursor: pointer;
+  color: #cccccc;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: color 0.3s;
+  font-size: 0.9em;
+}
+.crypto-switch input:checked + label {
+  color: #ffffff;
+}
 
-```html
-<div class="chart-card">
-  <div class="header">
-    <span class="logo">CryptoApp</span>
-    <span class="open">Open App →</span>
-  </div>
+.crypto-switch .slider {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  width: calc((100% - 24px) / 4);
+  background: rgba(255, 255, 255, 0.4);
+  -webkit-backdrop-filter: blur(1px);
+  backdrop-filter: blur(0.5px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  z-index: 1;
+  transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  box-shadow:
+    0 4px 8px rgba(0, 0, 0, 0.4),
+    inset 0 -2px 4px rgba(255, 255, 255, 0.2);
+}
+.crypto-switch input:hover + label {
+  color: #ffffff;
+}
+#bitcoin:checked ~ .slider {
+  transform: translateX(0%);
+}
+#ethereum:checked ~ .slider {
+  transform: translateX(105%);
+}
+#solana:checked ~ .slider {
+  transform: translateX(214%);
+}
+#tether:checked ~ .slider {
+  transform: translateX(323%);
+}
 
-  <fieldset class="crypto-switch">
-    <input type="radio" id="bitcoin" name="crypto" checked />
-    <label for="bitcoin">BTC</label>
-    <input type="radio" id="ethereum" name="crypto" />
-    <label for="ethereum">ETH</label>
-    <input type="radio" id="solana" name="crypto" />
-    <label for="solana">SOL</label>
-    <input type="radio" id="tether" name="crypto" />
-    <label for="tether">TET</label>
-    <div class="slider"></div>
-  </fieldset>
+.price-infos {
+  margin-bottom: 16px;
+}
+.price-info .price {
+  font-size: 1.6em;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+.price-info .stats {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9em;
+}
+.price-info .change {
+  color: #0f0;
+  font-weight: bold;
+}
 
-  <div class="price-infos">
-    <!-- .price-info blocks per series -->
-  </div>
+.chart {
+  height: 90px;
+  background: #1b1b1b;
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+}
+.chart svg {
+  width: 100%;
+  height: 100%;
+  display: none;
+  transform: translateX(2px) scale(1.05);
+}
+.chart path {
+  stroke: #0f0;
+  stroke-width: 0.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 500;
+  stroke-dashoffset: 500;
+  animation: draw 3s forwards;
+  fill: rgba(0, 255, 0, 0.2);
+}
+@keyframes draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
 
-  <div class="chart">
-    <!-- one or more <svg> charts with <path> lines -->
-  </div>
-</div>
-```
+.crypto-card:has(#bitcoin:checked) .chart #chart-bitcoin,
+.crypto-card:has(#ethereum:checked) .chart #chart-ethereum,
+.crypto-card:has(#solana:checked) .chart #chart-solana,
+.crypto-card:has(#tether:checked) .chart #chart-tether {
+  display: block;
+}
 
-- The corresponding CSS (colors, layout, animation) should be **copied or closely mirrored** from the original snippet you provided so that all charts in this project share this same interactive card look and feel.
+.price-info {
+  display: none;
+}
+.crypto-card:has(#bitcoin:checked) .price-info.bitcoin,
+.crypto-card:has(#ethereum:checked) .price-info.ethereum,
+.crypto-card:has(#solana:checked) .price-info.solana,
+.crypto-card:has(#tether:checked) .price-info.tether {
+  display: block;
+}
