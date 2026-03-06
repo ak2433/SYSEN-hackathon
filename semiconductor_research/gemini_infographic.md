@@ -1,20 +1,24 @@
-# OmniLogix AI Live Dashboard
+<p align="center">
+  <strong>OmniLogix AI</strong> Live Dashboard
+</p>
 
-**Real-time synthetic data augmentation for tracking semiconductor supply chains across trans-Pacific routes.**  
-Monitoring Intel, Nvidia, and Broadcom logistics.
+<p align="center">
+  Real-time synthetic data augmentation for tracking semiconductor supply chains across trans-Pacific routes.<br>
+  Monitoring Intel, Nvidia, and Broadcom logistics.
+</p>
 
-> **[View the full interactive infographic →](https://gemini.google.com/share/db1f1be5ba57)**
+<p align="center">
+  <a href="https://gemini.google.com/share/db1f1be5ba57"><strong>View the full interactive infographic →</strong></a>
+</p>
 
 ---
 
 ## Key Metrics
 
-| Metric | Value | Status |
-|--------|-------|--------|
-| **Active Shipments** | 1,248 | ▲ 12% vs Last Week |
-| **Avg Transit Delay** | 1.4 Days | Synthetic Risk Elevated |
-| **Synthetic Threat Index** | 72/100 | Typhoon Warning Active |
-| **AI Confidence** | 94.6% | Model Re-trained 2h ago |
+| | **Active Shipments** | **Avg Transit Delay** | **Synthetic Threat Index** | **AI Confidence** |
+|:---:|:---:|:---:|:---:|:---:|
+| **Value** | **1,248** | **1.4 Days** | **72/100** | **94.6%** |
+| **Status** | ▲ 12% vs Last Week | Synthetic Risk Elevated | Typhoon Warning Active | Model Re-trained 2h ago |
 
 ---
 
@@ -23,28 +27,30 @@ Monitoring Intel, Nvidia, and Broadcom logistics.
 The global semiconductor supply chain is highly segmented. Raw silicon processing and advanced fabrication primarily occur in Asian foundries. Final assembly, testing, and distribution for major tech giants are strategically split between Asian hubs and domestic US facilities to mitigate geopolitical and logistical friction.
 
 ```mermaid
-flowchart LR
+flowchart TB
     subgraph Asia["Asia Mfg & Fab Sites"]
-        NB[Nvidia & Broadcom: Taiwan]
-        IntelA[Intel: Malaysia, Vietnam]
+        NB["Nvidia & Broadcom: Taiwan Hsinchu, Taoyuan"]
+        IntelA["Intel: Malaysia Penang, Vietnam Ho Chi Minh"]
     end
 
-    subgraph Transport
-        Air[Air Freight 14-24 hrs]
-        Ocean[Ocean Freight 15-30 days]
+    subgraph Transport["Transport - Synthetic Monitoring Active"]
+        Air["Air Freight 14-24 hrs"]
+        Ocean["Ocean Freight 15-30 days"]
     end
 
     subgraph US["US Assembly & Dist Hubs"]
-        IntelU[Intel: AZ, OH]
-        NvidiaU[Nvidia: CA, TX]
-        BroadcomU[Broadcom: CA]
+        IntelU["Intel: Chandler AZ, New Albany OH"]
+        NvidiaU["Nvidia: Santa Clara CA, Austin TX"]
+        BroadcomU["Broadcom: San Jose CA, Irvine CA"]
     end
 
-    Asia --> Air --> US
-    Asia --> Ocean --> US
+    Asia --> Air
+    Asia --> Ocean
+    Air --> US
+    Ocean --> US
 ```
 
-### Asia Manufacturing & Fab Sites
+### Asia Mfg & Fab Sites
 
 | Company | Location | Function |
 |---------|----------|----------|
@@ -53,7 +59,7 @@ flowchart LR
 | **Intel** | 🇲🇾 Penang, Malaysia | Assembly/Test |
 | **Intel** | 🇻🇳 Ho Chi Minh, Vietnam | Assembly |
 
-### US Assembly & Distribution Hubs
+### US Assembly & Dist Hubs
 
 | Company | Location | Function |
 |---------|----------|----------|
@@ -70,12 +76,16 @@ flowchart LR
 
 *Comparing the proportion of manufacturing and assembly loads processed per week across key geographic sectors.*
 
-| Region | Nvidia | Broadcom | Intel |
-|--------|--------|----------|-------|
-| Taiwan (TSMC/Foxconn) | 85 | 75 | 20 |
-| Malaysia (Intel Assembly) | 5 | 10 | 90 |
-| US West Coast Hubs | 60 | 50 | 30 |
-| US Inland Facilities | 20 | 15 | 80 |
+**Relative Volume Load** (stacked by company)
+
+| Region | Nvidia | Broadcom | Intel | Total |
+|--------|:------:|:--------:|:-----:|:-----:|
+| Taiwan (TSMC/Foxconn) | 85 | 75 | 20 | 180 |
+| Malaysia (Intel Assembly) | 5 | 10 | 90 | 105 |
+| US West Coast Hubs | 60 | 50 | 30 | 140 |
+| US Inland Facilities | 20 | 15 | 80 | 115 |
+
+*Stacked breakdown: Nvidia (purple) | Broadcom (pink) | Intel (cyan)*
 
 ---
 
@@ -83,12 +93,12 @@ flowchart LR
 
 *Analyzing route cost versus transit time. Bubble size indicates total shipped volume in metric tons.*
 
-| Route | Transit Time | Cost per Ton (USD) | Relative Volume |
-|-------|--------------|-------------------|-----------------|
-| Taipei → SFO (Air) | 1.5 days | $8,500 | Small |
-| Kaohsiung → LAX (Ocean) | 22 days | $1,200 | Large |
-| Penang → AZ (Air) | 2 days | $9,200 | Small |
-| Penang → LAX (Ocean) | 28 days | $1,100 | Medium |
+| Route | Transit Time (Days) | Cost per Ton (USD) | Relative Volume |
+|-------|:------------------:|:------------------:|:---------------:|
+| Taipei → SFO (Air) | 1.5 | $8,500 | Small |
+| Kaohsiung → LAX (Ocean) | 22.0 | $1,200 | Large |
+| Penang → AZ (Air) | 2.0 | $9,200 | Small |
+| Penang → LAX (Ocean) | 28.0 | $1,100 | Medium |
 
 ---
 
@@ -100,8 +110,8 @@ Traditional historical models fail during unprecedented global events. By inject
 
 *Radar analysis shows how strongly current supply chain node configurations react to distinct categories of synthetic environmental and political stress injections.*
 
-| Risk Factor | Current Operations | AI Simulated Max Stress |
-|-------------|-------------------|-------------------------|
+| Risk Factor | Current Operations Profile | AI Simulated Maximum Stress |
+|-------------|:--------------------------:|:---------------------------:|
 | Typhoon / Extreme Weather | 45 | 95 |
 | Port Labor Strikes | 60 | 85 |
 | Tariff Imposition | 30 | 90 |
@@ -110,10 +120,12 @@ Traditional historical models fail during unprecedented global events. By inject
 
 ### Predictive Delay Modeling
 
-*Live AI performance. Contrasts standard expected delivery timelines against AI-predicted delays after injecting live weather anomaly and port congestion synthetic data streams.*
+*Live AI performance. The chart contrasts standard expected delivery timelines against AI-predicted delays after injecting live weather anomaly and port congestion synthetic data streams.*
 
-| Day | Standard Baseline (Hours) | AI Predicted Delay (Hours) |
-|-----|---------------------------|----------------------------|
+**Cumulative Delay (Hours)**
+
+| Day | Standard Baseline (Hours Delay) | AI Predicted Delay (Post-Synthetic Injection) |
+|-----|:------------------------------:|:--------------------------------------------:|
 | Day 1 | 2 | 2 |
 | Day 2 | 3 | 5 |
 | Day 3 | 2 | 12 |
@@ -122,13 +134,25 @@ Traditional historical models fail during unprecedented global events. By inject
 | Day 6 | 5 | 42 |
 | Day 7 | 4 | 35 |
 
+```mermaid
+xychart
+    title "Predictive Delay: Baseline vs AI-Predicted"
+    x-axis [Day 1, Day 2, Day 3, Day 4, Day 5, Day 6, Day 7]
+    y-axis "Cumulative Delay (Hours)" 0 --> 50
+    line "Standard Baseline" [2, 3, 2, 4, 3, 5, 4]
+    line "AI Predicted (Post-Synthetic)" [2, 5, 12, 24, 38, 42, 35]
+```
+
 ---
 
 ## Methodology Notes
 
-- **Palette:** Vibrant Cyber/Neon (Background: #0f172a, Accents: #06b6d4, #ec4899, #8b5cf6, #f59e0b)
-- **Chart Choices:** Stacked Bar for Volume (compare parts to whole), Bubble for Transit (relationships between Cost/Time/Vol), Radar for Risk (multivariate factors), Line for Delay Modeling (change over time)
-- **Plan Summary:** 1. Global Network overview, 2. Volume & Transit analysis, 3. Synthetic Data injection impact
+| Item | Details |
+|------|---------|
+| **Palette** | Vibrant Cyber/Neon (Background: `#0f172a`, Accents: `#06b6d4` cyan, `#ec4899` pink, `#8b5cf6` purple, `#f59e0b` amber) |
+| **Plan Summary** | 1. Global Network overview (HTML grid), 2. Volume & Transit analysis (Bar/Bubble charts), 3. Synthetic Data injection impact (Radar/Line charts) |
+| **Chart Choices** | Stacked Bar for Volume (compare parts to whole), Bubble for Transit (relationships between Cost/Time/Vol), Radar for Risk (multivariate factors), Line for Delay Modeling (change over time) |
+| **Color Legend** | Intel = Cyan, Nvidia = Purple, Broadcom = Pink |
 
 ---
 
