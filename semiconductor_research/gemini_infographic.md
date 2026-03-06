@@ -51,6 +51,8 @@ flowchart TB
     Ocean --> US
 ```
 
+**Synthetic Monitoring Active** *(Transport section: Air Freight 14–24 hrs • Ocean Freight 15–30 days)*
+
 ### Asia Mfg & Fab Sites
 
 | Company | Location | Function |
