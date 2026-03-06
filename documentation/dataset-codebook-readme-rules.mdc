@@ -1,0 +1,116 @@
+# Dataset Codebook and README Rules
+
+Use this document when creating or reviewing **dataset documentation**: codebooks and READMEs that describe each file and variable and the background needed to collect or use the data.
+
+---
+
+## 1. Purpose of These Documents
+
+- **README** – High-level overview: what the dataset is, where it lives, how to get it, and how to use it (quick start, citations, license).
+- **Codebook** – Detailed reference: every file, table, and variable; definitions; valid values; and any background needed to interpret or reproduce the data.
+
+Together they let someone else **understand**, **reuse**, and **reproduce** your data.
+
+---
+
+## 2. Dataset README Requirements
+
+Every dataset (or data folder) MUST have a README that includes:
+
+| Section | Required | Description |
+|--------|----------|-------------|
+| **Title & short description** | Yes | Dataset name and 1–3 sentences on what it is and why it exists. |
+| **Source & provenance** | Yes | Where the data came from (survey, API, scrape, simulation) and how it was obtained. |
+| **Files overview** | Yes | List of files (or tables) with short description and relationship (e.g. "one row per shipment"). |
+| **How to get the data** | Yes | Steps to download, generate, or access (paths, scripts, credentials if applicable). |
+| **Quick start** | Yes | Minimal steps to load and use (e.g. "Open `data.csv` in R/Python" or "Run `scripts/build_data.py`"). |
+| **License & citation** | If applicable | License (e.g. CC-BY, MIT) and how to cite the dataset. |
+| **Contact / maintainer** | Optional | Who to ask for questions or updates. |
+
+---
+
+## 3. Codebook Requirements
+
+A **codebook** is the detailed reference for files and variables. It MUST include:
+
+### 3.1 File-level description
+
+For **each** file (or table):
+
+- **File name** – Exact filename or table name.
+- **Description** – What the file contains (e.g. "Quarterly shipments by origin and destination").
+- **Unit of observation** – What one row (or record) represents (e.g. one shipment, one facility, one day).
+- **Number of rows/records** – If fixed (e.g. "N = 1,200") or how it can vary.
+- **Relationship to other files** – Keys or links to other files (e.g. "Links to `facilities.csv` via `facility_id`").
+- **Format** – File format (CSV, Parquet, etc.) and encoding if relevant (e.g. UTF-8).
+
+### 3.2 Variable-level description
+
+For **each** variable (column) in each file:
+
+- **Variable name** – Exact name as in the file.
+- **Description** – What the variable measures or represents.
+- **Type** – Data type (e.g. integer, float, string, date, categorical).
+- **Valid values / range** – Allowed values, codes, or range (e.g. "1–5", "ISO 3166-1 alpha-2", "YYYY-MM-DD").
+- **Missing value convention** – How missing or N/A is represented (e.g. empty, `NA`, `-999`, blank).
+- **Units** – If numeric and not dimensionless (e.g. "dollars USD", "tons", "days").
+- **Background** – Any context needed to interpret (e.g. "Code 3 = refused; see survey questionnaire Q12").
+
+Use a consistent layout, e.g. tables or structured blocks:
+
+```markdown
+### File: `shipments.csv`
+
+| Variable    | Type   | Description                    | Valid values | Missing |
+|------------|--------|--------------------------------|--------------|---------|
+| `shipment_id` | string | Unique shipment identifier   | Non-empty    | —       |
+| `origin`   | string | Origin facility code          | See facilities.csv | Blank |
+| `weight_kg`| float  | Shipment weight in kilograms  | ≥ 0          | -1      |
+```
+
+---
+
+## 4. Background for Collection and Use
+
+Document any background needed to **collect** or **use** the data:
+
+- **Collection method** – How the data was gathered (instrument, script, API, manual entry).
+- **Time period** – Date range or reference period (e.g. "January 2024 – March 2024").
+- **Population / scope** – What the data is intended to represent (e.g. "US semiconductor shipments only").
+- **Known limitations** – Gaps, biases, or caveats (e.g. "Excludes air freight before 2024-02").
+- **Dependencies** – Software, packages, or external data needed to generate or use the dataset (e.g. "Requires Python 3.10+ and `pandas`").
+- **Scripts and reproducibility** – Where scripts live that generate or process the data (e.g. `scripts/build_data.py`) and how to run them.
+
+---
+
+## 5. Where to Put These Documents
+
+- **README**: In the root of the dataset folder (e.g. `data/README.md` or `semiconductor_research/README.md`).
+- **Codebook**: Either:
+  - In the same folder as the README (e.g. `data/CODEBOOK.md`), or
+  - Embedded in the README in a "Codebook" section if the dataset is small.
+- **Cross-references**: README should link to the codebook; codebook can link back to README and to any scripts or external sources.
+
+---
+
+## 6. Style and Conventions
+
+- Use **clear, consistent variable and file names**; match the names used in the actual data.
+- Use **tables** for variable lists so they are easy to scan and compare.
+- Define **acronyms and codes** the first time they appear (e.g. "OSAT (Outsourced Assembly and Test)").
+- Keep **one concept per row** in variable tables (one row per variable).
+- If the dataset is versioned, **note the version** in the README and codebook (e.g. "Dataset version 1.2; codebook updated 2024-03-01").
+
+---
+
+## 7. Checklist Before Publishing
+
+- [ ] README has title, source, file list, how to get data, and quick start.
+- [ ] Every data file is listed and described (unit of observation, format, links to other files).
+- [ ] Every variable has name, description, type, valid values, and missing convention.
+- [ ] Background for collection and use is documented (method, period, scope, limitations).
+- [ ] Scripts or steps for reproducing the data are referenced and runnable.
+- [ ] License and citation are stated if applicable.
+- [ ] README and codebook are in the agreed location and linked to each other.
+
+Use these rules whenever you create or update dataset documentation or codebooks in this project.
