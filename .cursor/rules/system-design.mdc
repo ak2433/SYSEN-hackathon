@@ -6,3 +6,6 @@ alwaysApply: true
 
 - Use **FastAPI** as the default framework for all backend HTTP APIs and services in this project.
 - When creating new backend services, prefer FastAPI over other Python or non-Python web frameworks unless there is a strong, clearly documented reason otherwise.
+
+## Frontend Framework
+- Whenever adding large amounts of css, put it in a stylesheet. 
