@@ -89,6 +89,40 @@ The app combines multiple risk signals:
 
 These are combined into a **composite risk score** for planning and a **risk factor (1–10)** for tracking.
 
+### Risk Score Calculations
+
+**Plan Shipment / Import-Export — Composite Risk (0–1)**
+
+A weighted average of four factors from historical shipment data for the route:
+
+| Variable | Weight | Source |
+|----------|--------|--------|
+| Weather risk | **35%** | Average `weather_risk_score` from matching shipments |
+| Geopolitical risk | **30%** | Average `geopolitical_risk_score` from matching shipments |
+| Port congestion | **20%** | Average `port_congestion_score` from matching shipments |
+| Labor risk | **15%** | Average `labor_risk_score` from matching shipments |
+
+**Formula:** `composite = 0.35×weather + 0.30×geopolitical + 0.20×port_congestion + 0.15×labor` (capped at 1.0)
+
+---
+
+**Track Shipment — Risk Factor (1–10)**
+
+A weighted combination of four inputs, scaled to 1–10:
+
+| Variable | Weight | How it's computed |
+|----------|--------|-------------------|
+| Delay probability | **30%** | Fraction of matching historical shipments that were delayed (status, delay_hours, or missed_delivery_window) |
+| Weather forecast risk | **30%** | 0.1 (low), 0.5 (medium), or 0.9 (high) from 7-day forecast severity |
+| Geopolitics | **30%** | Average geopolitical risk from route context (same as above) |
+| Unprecedented event | **10%** | Base rate from shipments with weather/geopolitical events × 2, plus +0.15 per high-impact active event (e.g. typhoon, Taiwan Strait, South China Sea) |
+
+**Formula:** `composite = 0.30×delay_prob + 0.30×weather + 0.30×geopolitics + 0.10×unprecedented` (capped at 1.0)
+
+Then: `risk_factor = round(composite × 10)`, clamped to 1–10. If the route uses a chokepoint (e.g. South China Sea), **+1** is added (capped at 10).
+
+**Risk bands:** 1–3 = low, 4–6 = moderate, 7–10 = elevated
+
 ---
 
 ## Who It’s For
