@@ -1,0 +1,12 @@
+{
+  "name": "data-loaders",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "load-shipments": "node load_shipments_to_supabase.mjs"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0",
+    "csv-parse": "^5.5.0"
+  }
+}
