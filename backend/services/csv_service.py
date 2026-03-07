@@ -7,6 +7,16 @@ from typing import List, Dict, Any
 CSV_PATH = Path(__file__).resolve().parent.parent.parent / "data" / "semiconductor_shipments_500(1).csv"
 
 
+def load_shipment_events(shipment_id: str = None, limit: int = 100) -> List[Dict[str, Any]]:
+    """No event log in CSV backend; return empty."""
+    return []
+
+
+def get_event_log_stats() -> Dict[str, Any]:
+    """No event log in CSV backend; return empty stats."""
+    return {"total_events": 0, "exception_count": 0, "by_event_type": {}}
+
+
 def load_shipments() -> List[Dict[str, Any]]:
     """Load CSV into list of dicts."""
     rows = []
