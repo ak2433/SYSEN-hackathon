@@ -2,6 +2,8 @@
 
 Semiconductor supply chain intelligence platform built for the SYSEN Hackathon.
 
+This project now uses **OpenAI only** for LLM features (no Ollama/local model runtime).
+
 The app helps users:
 - understand current import/export conditions,
 - generate route-aware shipment plans, and
@@ -124,6 +126,7 @@ VITE_API_BASE_URL=
 ```
 
 > `OPENAI_API_KEY` is required for AI-generated summaries/plans/tracking text.
+> Ollama is deprecated/removed from this project.
 
 ---
 
@@ -276,6 +279,9 @@ Set these as environment variables in the Connect content settings:
   - Validate `OPENAI_API_KEY`.
   - Ensure key is from the OpenAI Platform API keys page.
   - Ensure billing is enabled for API usage.
+- **Looking for Ollama setup?**
+  - Ollama is no longer supported in this codebase.
+  - Configure `OPENAI_API_KEY` instead.
 
 - **Frontend shows network/CORS errors**
   - In dev, ensure backend is running on `:8000`.
