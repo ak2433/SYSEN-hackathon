@@ -123,6 +123,11 @@ FRONTEND_BUILD_DIR=backend/static
 
 # Frontend API base URL at build/runtime (Vite).
 VITE_API_BASE_URL=
+
+# Posit Connect deployment (for pushme.sh)
+CONNECT_SERVER=https://your-connect-server.example.com
+CONNECT_API_KEY=your_connect_api_key
+# CONNECT_PYTHON_VERSION=3.12.4  # optional; override if server has different Python
 ```
 
 > `OPENAI_API_KEY` is required for AI-generated summaries/plans/tracking text.
@@ -211,6 +216,23 @@ Then open `http://localhost:8000`.
 
 This project is prepared for Posit Connect as a FastAPI deployment with optional bundled frontend.
 
+### Quick deploy (pushme.sh)
+
+From repo root, add to `.env`:
+
+```
+CONNECT_SERVER=https://your-connect-server.example.com
+CONNECT_API_KEY=your_connect_api_key
+```
+
+Then run:
+
+```bash
+./pushme.sh
+```
+
+This builds the frontend, bundles it into `backend/static`, and deploys via `rsconnect deploy fastapi`.
+
 ### Deployment model
 
 - Deploy the `backend/` directory as a FastAPI content item.
@@ -255,14 +277,21 @@ rsconnect deploy fastapi \
   backend/
 ```
 
-### 5) Configure secrets on Posit Connect
+### 5) Configure environment variables on Posit Connect
 
-Set these as environment variables in the Connect content settings:
+**Required for the app to show data.** Your local `.env` is not deployed—you must add these in Posit Connect:
 
-- `OPENAI_API_KEY` (required)
-- `OPENAI_MODEL` (optional, default `gpt-4o`)
-- `CORS_ORIGINS` (only needed if frontend is hosted on a different origin)
-- `FRONTEND_BUILD_DIR` (optional, default `backend/static` in deployed bundle)
+1. Open your deployed content in Posit Connect.
+2. Go to **Settings** (or the content’s gear icon) → **Variables** (or **Environment**).
+3. Add these variables:
+
+| Variable | Required | Purpose |
+|----------|----------|---------|
+| `OPENAI_API_KEY` | **Yes** | AI summaries, plans, tracking text |
+| `SUPABASE_URL` | **Yes** | Shipment data, risk scores |
+| `SUPABASE_SERVICE_ROLE_KEY` | **Yes** | Supabase auth (or use `SUPABASE_ANON_KEY`) |
+| `OPENAI_MODEL` | No | Default `gpt-4o` |
+| `CORS_ORIGINS` | No | Only if frontend is on a different origin |
 
 ### 6) Validate deployment
 
@@ -291,3 +320,22 @@ Set these as environment variables in the Connect content settings:
   - Re-run `npm run build` in `dashboard/`.
   - Re-run `python backend/scripts/prepare_frontend.py`.
   - Confirm `backend/static/index.html` exists before deployment.
+
+- **"Dependency missing: dash" when deploying from Git**
+  - This app is FastAPI, not Dash. The error occurs when Connect deploys from the wrong directory.
+  - **Fix:** When linking your Git repo (Publish > Import from Git), select **`backend`** as the target directory. Connect lists directories that contain `manifest.json`—the `backend/` folder has one that declares this as a FastAPI app.
+  - Do not add `dash` to requirements.txt; that would incorrectly treat the app as a Dash app.
+
+- **"[Missing OPENAI_API_KEY]" even after adding variables**
+  - Variables in Posit Connect apply only after the app **restarts**. Add your variables, then:
+    1. Go to your content’s **Settings**
+    2. Click **Republish** or **Update** (or use the content menu to restart)
+  - Confirm variables: visit `https://your-app-url/api/debug/env` and check `openai_configured` and `supabase_configured`
+  - Use the exact names: `OPENAI_API_KEY`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (case-sensitive)
+  - Do **not** add `CONNECT_SERVER` or `CONNECT_API_KEY` to the content variables—those are only for the deploy script
+
+- **Risk scores and shipment data all show 0% (Supabase not loading)**
+  - Visit `https://your-app-url/api/debug/env` and check `supabase_rows`. If it's 0, Supabase isn't returning data.
+  - **Use the service role key, not the anon key:** In Supabase Dashboard → Settings → API, use the **service_role** key (or `sb_secret_...` in newer format). The `anon` / `sb_publishable_` key has limited permissions and may not read the `shipments` table.
+  - Ensure `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are in Posit Connect Variables, then **republish**.
+  - If your Supabase project is on the free tier and has been inactive, it may be paused—restore it from the Supabase dashboard.
