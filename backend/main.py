@@ -1,6 +1,6 @@
 """
 Supply Chain Portal API – semiconductor import/export, planning, tracking.
-Uses OpenAI GPT-4o for LLM, Open-Meteo for weather, routes + CSV for decisions.
+Uses OpenAI GPT-4o for LLM, Open-Meteo for weather, routes + Supabase (or CSV fallback) for decisions.
 """
 
 from fastapi import FastAPI, HTTPException
@@ -13,7 +13,7 @@ from route_suggester import ShipmentRequest, suggest_routes, RouteRecommendation
 from services.openai_service import generate
 from services.weather_service import get_most_severe_upcoming, get_weather_forecast, get_weather_forecast_risk
 from services.news_service import get_geopolitical_headlines
-from services.csv_service import (
+from services.shipment_service import (
     get_aggregate_stats,
     get_risk_context_for_route,
     get_delay_probability,
