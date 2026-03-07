@@ -3,7 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "load-shipments": "node load_shipments_to_supabase.mjs"
+    "load-shipments": "node load_shipments_to_supabase.mjs",
+    "load-events": "node load_shipment_events_to_supabase.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.0",

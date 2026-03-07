@@ -20,21 +20,32 @@ This folder holds the source CSV and instructions for the three Supabase dataset
 4. Upload `semiconductor_shipments_500(1).csv`.
 5. Map columns (names match the table); ensure date columns are parsed as timestamps.
 
-**Option B: Script (requires Supabase URL + key)**
+**Option B: Scripts (requires Supabase URL + key)**
 
 From the project root:
 
 ```bash
 cd data
-npm install  # or ensure @supabase/supabase-js and csv-parse are available
-SUPABASE_URL=https://your-project.supabase.co SUPABASE_SERVICE_ROLE_KEY=your_key node load_shipments_to_supabase.mjs
+npm install
+export SUPABASE_URL=https://your-project.supabase.co
+export SUPABASE_SERVICE_ROLE_KEY=your_key
+
+npm run load-shipments    # load CSV into shipments
+npm run load-events       # derive and load shipment_event_log from same CSV (run after load-shipments)
 ```
 
-Use the script in `data/load_shipments_to_supabase.mjs` if you prefer automated loading.
+## Deriving and loading Dataset 2 (shipment_event_log)
 
-## Dataset 2 and 3
+After **shipments** are loaded, run the event loader to derive event rows from the same CSV (2 events per shipment: departure + last known scan with telemetry):
 
-- **shipment_event_log:** Populate from app logic (e.g. one event per shipment using `edi_last_event_code`, `departure_time`/`actual_arrival_time`, `temp_c_recorded`, `humidity_pct_recorded`, `shock_g_max_recorded`) or from a separate events export.
-- **warehouse_operations:** Populate from warehouse metrics (e.g. by aggregating shipments by `destination_site` and time, or from synthetic hourly/daily data).
+```bash
+cd data
+SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... npm run load-events
+```
 
-The CSV only contains **Dataset 1 (shipments)**. Event and warehouse data can be derived or generated per the project suggestions doc.
+- **Event 1:** Departure at `departure_time`, `event_type` = `AF`, `site` = origin.
+- **Event 2:** Last known at `actual_arrival_time` or `planned_arrival_time`, `event_type` = EDI code (e.g. POD, OA, I1, XL, PR), `site` = `current_location` or destination; includes `temperature_c`, `humidity_pct`, `shock_g`, `exception_flag`, and `status_note` from weather/geopolitical events.
+
+## Dataset 3 (warehouse_operations)
+
+Populate from warehouse metrics (e.g. by aggregating shipments by `destination_site` and time, or from synthetic hourly/daily data). The CSV does not contain warehouse time-series; use app logic or synthetic data per the project suggestions doc.
