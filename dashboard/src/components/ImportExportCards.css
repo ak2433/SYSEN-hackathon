@@ -1,12 +1,55 @@
 .import-export__cards {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 1.5rem;
   margin-bottom: 2rem;
+}
+
+.import-export__risk-cards {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+/* Weather Forecast and Active Risk: square, less compressed */
+.import-export__cards .dash-card:nth-child(1),
+.import-export__cards .dash-card:nth-child(3) {
+  aspect-ratio: 1;
+  padding: 2rem;
+  min-height: 0;
+}
+
+.import-export__cards .dash-card:nth-child(1) .dash-card__value,
+.import-export__cards .dash-card:nth-child(3) .dash-card__value {
+  font-size: 2.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.import-export__cards .dash-card:nth-child(1) .dash-card__subtitle,
+.import-export__cards .dash-card:nth-child(3) .dash-card__subtitle {
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+@media (max-width: 1200px) {
+  .import-export__risk-cards {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 @media (max-width: 900px) {
   .import-export__cards {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .import-export__risk-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .import-export__risk-cards {
+    grid-template-columns: 1fr;
   }
 }

@@ -74,14 +74,14 @@ body {
 .loading span {
   width: 4px;
   height: 50px;
-  background: #4c86f9;
+  background: #14b8a6;
   animation: scale var(--speed-of-animation) ease-in-out infinite;
 }
 
-.loading span:nth-child(2) { background: #49a84c; animation-delay: -0.8s; }
-.loading span:nth-child(3) { background: #f6bb02; animation-delay: -0.7s; }
-.loading span:nth-child(4) { background: #f6bb02; animation-delay: -0.6s; }
-.loading span:nth-child(5) { background: #2196f3; animation-delay: -0.5s; }
+.loading span:nth-child(2) { background: #f59e0b; animation-delay: -0.8s; }
+.loading span:nth-child(3) { background: #a855f7; animation-delay: -0.7s; }
+.loading span:nth-child(4) { background: #ec4899; animation-delay: -0.6s; }
+.loading span:nth-child(5) { background: rgb(0 107 179); animation-delay: -0.5s; }
 
 @keyframes scale {
   0%, 40%, 100% { transform: scaleY(0.05); }

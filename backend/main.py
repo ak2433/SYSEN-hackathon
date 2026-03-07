@@ -64,6 +64,7 @@ async def get_import_export_summary(req: ImportExportRequest):
     weather = get_most_severe_upcoming(region)
     headlines = get_geopolitical_headlines(5)
     stats = get_aggregate_stats()
+    risk_scores = _build_plan_risk_scores(get_risk_context_for_route(region, ""))
 
     context = (
         f"Weather: {weather.get('event', 'N/A')} in {region} (severity: {weather.get('severity', 'N/A')}). "
@@ -82,18 +83,109 @@ async def get_import_export_summary(req: ImportExportRequest):
         "weather_event": weather,
         "headlines": headlines,
         "stats": stats,
+        "risk_scores": risk_scores,
     }
 
 
 # ─── 2. Plan shipment ────────────────────────────────────────────────────────
 
+
+def _build_fallback_plan(
+    req: PlanShipmentRequest,
+    origin_name: str,
+    origin_country: str,
+    dest_name: str,
+    best: RouteRecommendation,
+    recs: List[RouteRecommendation],
+    risk_factors: List[str],
+) -> str:
+    """Build a deterministic shipment plan when LLM is unavailable."""
+    lines = [
+        f"Recommended route: {best.lane.mode} ({best.lane.route_type})",
+        "",
+        f"For {req.company} shipping {req.part_type} from {origin_name} ({origin_country}) to {dest_name}, "
+        f"we recommend Option #{best.rank}: {best.lane.mode} {best.lane.route_type}. "
+        f"This route has the highest score ({best.score}) and offers {best.adjusted_days_min}–{best.adjusted_days_max} day transit "
+        f"at {best.estimated_cost_tier} cost.",
+        "",
+        f"Why this route: {best.rationale}",
+        "",
+        f"Given your {req.priority} priority and {req.part_type} shipment, this option balances "
+        "reliability, transit time, and cost.",
+    ]
+    if (req.notes or "").strip() or (req.concerns or "").strip():
+        lines.append("")
+        if req.notes:
+            lines.append(f"Your notes: {req.notes}")
+        if req.concerns:
+            lines.append(f"Your concerns: {req.concerns}")
+    lines.append("")
+    lines.append("Risk factors to monitor:")
+    for rf in risk_factors:
+        lines.append(f"• {rf}")
+    return "\n".join(lines)
+
+
+def _derive_risk_factors(
+    risk_context: Dict[str, Any],
+    origin_country: str,
+    dest_name: str,
+    recs: List[RouteRecommendation],
+) -> List[str]:
+    """Derive risk factors when route suggester returns none."""
+    factors = []
+    wr = risk_context.get("weather_risk", 0) or 0
+    gr = risk_context.get("geopolitical_risk", 0) or 0
+    pc = risk_context.get("port_congestion", 0) or 0
+    lr = risk_context.get("labor_risk", 0) or 0
+
+    if wr >= 0.2:
+        factors.append("Weather-related delays possible in the region.")
+    if gr >= 0.2:
+        factors.append("Geopolitical uncertainty may affect transit.")
+    if pc >= 0.2:
+        factors.append("Port congestion could extend lead times.")
+    if lr >= 0.2:
+        factors.append("Labor availability may impact carrier capacity.")
+
+    for r in recs:
+        if r.lane.chokepoint_exposure and r.lane.mode == "sea":
+            factors.append("Route passes through South China Sea chokepoint.")
+            break
+
+    factors.append("Transit time variability depending on carrier and conditions.")
+    factors.append("Carrier capacity may be limited during peak periods.")
+
+    return list(dict.fromkeys(factors))
+
+
+def _build_plan_risk_scores(risk_context: Dict[str, Any]) -> Dict[str, float]:
+    """Normalize plan risk scores and add a composite score (0-1)."""
+    weather = float(risk_context.get("weather_risk", 0) or 0)
+    geopolitical = float(risk_context.get("geopolitical_risk", 0) or 0)
+    port_congestion = float(risk_context.get("port_congestion", 0) or 0)
+    labor = float(risk_context.get("labor_risk", 0) or 0)
+    composite = min(1.0, round(0.35 * weather + 0.30 * geopolitical + 0.20 * port_congestion + 0.15 * labor, 3))
+
+    return {
+        "weather_risk": weather,
+        "geopolitical_risk": geopolitical,
+        "port_congestion": port_congestion,
+        "labor_risk": labor,
+        "composite_risk": composite,
+    }
+
+
 @app.post("/api/plan-shipment")
 async def plan_shipment(req: PlanShipmentRequest):
-    """Use route suggester + Ollama to generate shipment plan and risk factors."""
-    risk_context = get_risk_context_for_route(
-        next((n.country for n in MANUFACTURER_NODES if n.id == req.origin_id), ""),
-        next((d.name for d in US_DESTINATIONS if d.id == req.destination_id), ""),
-    )
+    """Use route suggester + Ollama to generate shipment plan with best route and rationale."""
+    origin_node = next((n for n in MANUFACTURER_NODES if n.id == req.origin_id), None)
+    dest_hub = next((d for d in US_DESTINATIONS if d.id == req.destination_id), None)
+    origin_country = origin_node.country if origin_node else ""
+    origin_name = origin_node.name if origin_node else req.origin_id
+    dest_name = dest_hub.name if dest_hub else req.destination_id
+
+    risk_context = get_risk_context_for_route(origin_country, dest_name)
     request = ShipmentRequest(
         company=req.company,
         origin_id=req.origin_id,
@@ -104,42 +196,44 @@ async def plan_shipment(req: PlanShipmentRequest):
     )
     recs = suggest_routes(request, top_n=3)
 
-    notes_stripped = (req.notes or "").strip()
-    concerns_stripped = (req.concerns or "").strip()
-
-    if not notes_stripped and not concerns_stripped:
-        # No notes or concerns: pick the fastest route
-        fastest = min(recs, key=lambda r: r.adjusted_days_min) if recs else None
-        if fastest:
-            plan = (
-                f"Recommended: {fastest.lane.mode} ({fastest.lane.route_type}) – "
-                f"{fastest.adjusted_days_min}–{fastest.adjusted_days_max} days. "
-                f"This is the fastest option. {fastest.rationale}"
-            )
-        else:
-            plan = "No eligible routes found for this shipment."
-    else:
-        routes_text = "\n".join(
-            f"#{r.rank}: {r.lane.mode} {r.lane.route_type}, {r.adjusted_days_min}-{r.adjusted_days_max} days, "
-            f"score {r.score}, {r.estimated_cost_tier}. {r.rationale}"
-            for r in recs
-        )
-        prompt = (
-            f"User notes: {req.notes}. Concerns: {req.concerns}. "
-            f"Route options:\n{routes_text}\n\n"
-            "Generate a concise shipment plan (2–3 paragraphs) recommending the best option "
-            "and addressing the user's concerns. List key risk factors in bullet points."
-        )
-        plan = generate(prompt)
-
+    # Build risk factors for LLM context (before generating plan)
     risk_factors = []
     for r in recs:
         risk_factors.extend(r.risk_warnings)
-    risk_factors = list(dict.fromkeys(risk_factors))  # dedupe
+    risk_factors = list(dict.fromkeys(risk_factors))
+    if not risk_factors:
+        risk_factors = _derive_risk_factors(risk_context, origin_country, dest_name, recs)
+
+    # Generate plan in the same lightweight style as track-shipment for reliability.
+    if not recs:
+        plan = "No eligible routes found for this shipment."
+    else:
+        best = recs[0]
+        route_lines = "; ".join(
+            f"#{r.rank} {r.lane.mode} {r.lane.route_type} ({r.adjusted_days_min}-{r.adjusted_days_max} days, score {r.score}, {r.estimated_cost_tier})"
+            for r in recs
+        )
+        prompt = (
+            f"Shipment: {req.company} shipping {req.part_type} from {origin_name} ({origin_country}) to {dest_name}. "
+            f"Priority: {req.priority}. "
+            f"Recommended route: #{best.rank} {best.lane.mode} {best.lane.route_type}, "
+            f"{best.adjusted_days_min}-{best.adjusted_days_max} days, {best.estimated_cost_tier}. "
+            f"Route options: {route_lines}. "
+            f"Possible risk factors: {risk_factors}. "
+            f"User notes: {req.notes or '(none)'}. Concerns: {req.concerns or '(none)'}. "
+            "Write a brief 2-paragraph shipment plan that recommends the best route, explains why, "
+            "and mentions key risks to monitor."
+        )
+        plan = generate(prompt)
+
+        # Fallback: if LLM failed (Ollama not running, error, or empty), build deterministic plan
+        if not plan or plan.strip().startswith("["):
+            plan = _build_fallback_plan(req, origin_name, origin_country, dest_name, best, recs, risk_factors)
 
     return {
         "plan": plan,
         "risk_factors": risk_factors,
+        "risk_scores": _build_plan_risk_scores(risk_context),
         "recommendations": [
             {
                 "rank": r.rank,

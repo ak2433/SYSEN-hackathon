@@ -1,3 +1,12 @@
+/* Scrolling grid background animation */
+@keyframes bg-scrolling-reverse {
+  100% { background-position: 50px 50px; }
+}
+
+@keyframes bg-scrolling {
+  0% { background-position: 50px 50px; }
+}
+
 .landing {
   min-height: 100vh;
   display: flex;
@@ -5,6 +14,14 @@
   align-items: center;
   justify-content: center;
   padding: 2rem;
+  background-color: #212121;
+  /* Subtle grid pattern matching our dark color scheme */
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+  background-position: 0 0;
+  animation: bg-scrolling-reverse 0.92s linear infinite;
 }
 
 .landing__card {

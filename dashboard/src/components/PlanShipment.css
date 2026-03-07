@@ -2,8 +2,20 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  max-width: 480px;
+  max-width: 960px;
   overflow: visible;
+}
+
+.plan-form__columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+.plan-form__column {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 .plan-form__row {
@@ -54,4 +66,64 @@
 .plan-form__submit {
   margin-top: 0.5rem;
   align-self: flex-start;
+}
+
+@media (max-width: 840px) {
+  .plan-form {
+    max-width: 480px;
+  }
+
+  .plan-form__columns {
+    grid-template-columns: 1fr;
+  }
+}
+
+.plan-recommendations {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.plan-recommendation-item {
+  line-height: 1.5;
+}
+
+.plan-risk-cards {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.plan-context-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+@media (max-width: 1200px) {
+  .plan-risk-cards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .plan-context-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .plan-risk-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .plan-context-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .plan-risk-cards {
+    grid-template-columns: 1fr;
+  }
 }

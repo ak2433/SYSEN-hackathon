@@ -51,12 +51,6 @@ export default function ImportExport() {
       </header>
       <div className="import-export__cards">
         <DashCard
-          title="AI Summary"
-          value="Overview"
-          subtitle="Semiconductor import/export state"
-          accentColor="#14b8a6"
-        />
-        <DashCard
           title="Weather Forecast"
           value={data?.weather_event?.event || '—'}
           subtitle={
@@ -68,15 +62,47 @@ export default function ImportExport() {
         />
         <DashCard
           title="Top News Headline"
-          value={(data?.headlines?.[0] || '—').slice(0, 40) + ((data?.headlines?.[0]?.length || 0) > 40 ? '…' : '')}
+          value={(data?.headlines?.[0] || '—').slice(0, 25) + ((data?.headlines?.[0]?.length || 0) > 25 ? '…' : '')}
           subtitle="Geopolitical"
           accentColor="#a855f7"
         />
         <DashCard
           title="Active Risk Events"
-          value={data?.stats?.risk_events?.length ?? 0}
+          value={`${data?.stats?.risk_events?.length ?? 0}/10`}
           subtitle="From recent shipments"
           accentColor="#ec4899"
+        />
+      </div>
+      <div className="import-export__risk-cards">
+        <DashCard
+          title="Weather Risk"
+          value={`${Math.round((data?.risk_scores?.weather_risk ?? 0) * 100)}%`}
+          subtitle="Forecast-driven risk"
+          accentColor="#f59e0b"
+        />
+        <DashCard
+          title="Geopolitical Risk"
+          value={`${Math.round((data?.risk_scores?.geopolitical_risk ?? 0) * 100)}%`}
+          subtitle="Regional stability"
+          accentColor="#a855f7"
+        />
+        <DashCard
+          title="Port Congestion"
+          value={`${Math.round((data?.risk_scores?.port_congestion ?? 0) * 100)}%`}
+          subtitle="Port and handoff delays"
+          accentColor="#0ea5e9"
+        />
+        <DashCard
+          title="Labor Risk"
+          value={`${Math.round((data?.risk_scores?.labor_risk ?? 0) * 100)}%`}
+          subtitle="Carrier/staff capacity"
+          accentColor="#ec4899"
+        />
+        <DashCard
+          title="Composite Risk"
+          value={`${Math.round((data?.risk_scores?.composite_risk ?? 0) * 100)}%`}
+          subtitle="Weighted route risk score"
+          accentColor="#14b8a6"
         />
       </div>
       <section className="workflow-page__cards">
