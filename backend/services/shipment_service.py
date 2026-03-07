@@ -57,3 +57,19 @@ def get_unprecedented_event_probability(origin_country: str, active_events: list
         return _fn(origin_country, active_events)
     from services.csv_service import get_unprecedented_event_probability as _fn
     return _fn(origin_country, active_events)
+
+
+def load_shipment_events(shipment_id: str = None, limit: int = 100):
+    if _backend() == "supabase":
+        from services.supabase_service import load_shipment_events as _fn
+        return _fn(shipment_id, limit)
+    from services.csv_service import load_shipment_events as _fn
+    return _fn(shipment_id, limit)
+
+
+def get_event_log_stats():
+    if _backend() == "supabase":
+        from services.supabase_service import get_event_log_stats as _fn
+        return _fn()
+    from services.csv_service import get_event_log_stats as _fn
+    return _fn()
