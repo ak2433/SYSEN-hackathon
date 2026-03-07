@@ -8,11 +8,12 @@ import requests
 from dotenv import load_dotenv
 
 # Load env from backend/.env and repo-root/.env for flexible run locations.
+# Repo-root .env takes precedence (override=True) so root .env wins.
 service_dir = Path(__file__).resolve().parent
 backend_dir = service_dir.parent
 repo_root = backend_dir.parent
 load_dotenv(backend_dir / ".env")
-load_dotenv(repo_root / ".env")
+load_dotenv(repo_root / ".env", override=True)
 
 OPENAI_API_URL = "https://api.openai.com/v1/chat/completions"
 MODEL = os.getenv("OPENAI_MODEL", "gpt-4o")
